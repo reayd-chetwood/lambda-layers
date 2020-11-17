@@ -1,0 +1,21 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+    commands:
+      - echo Install started on `date`
+  pre_build:
+    commands:
+      - echo Prebuild started on `date`
+  build:
+    commands:
+      - echo Build started on `date`
+      - make build
+  post_build:
+    commands:
+      - echo Post-build started on `date`
+      - make upload
+artifacts:
+  files:
+    - '**/*'

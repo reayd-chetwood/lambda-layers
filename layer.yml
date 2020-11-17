@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  CloudFormation Template: This template builds a Lambda layer
+
+Parameters:
+
+  Description:
+    Description: "A description of the package"
+    Type: String
+
+  Public:
+    AllowedValues:
+      - true
+      - false
+    Default: false
+    Description: "Makes the layer publicly available"
+    Type: String
+
+  LayerName:
+    Description: "The name of the layer"
+    Type: String
+
+  OrganizationId:
+    Description: "An ID for the organization"
+    Type: String
+
+  PipelineArtifactsBucket:
+    Description: "The name of an PipelineArtifactsBucket containing the package"
+    Type: String
+
+Conditions:
+
+  CreatePublicLayerPermission: !Equals [ !Ref Public, true ]
+
+Resources:
+
+  LayerVersion:
+    Type: 'AWS::Lambda::LayerVersion'
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+      Content:
+        S3Bucket: !Ref PipelineArtifactsBucket
+        S3Key: !Sub '${LayerName}/package.zip'
+      Description: !Ref Description
+      LayerName: !Ref LayerName
+
+  LayerPermission:
+    Condition: CreatePublicLayerPermission
+    Type: AWS::Lambda::LayerVersionPermission
+    Properties:
+      Action: lambda:GetLayerVersion
+      LayerVersionArn: !Ref LayerVersion
+      OrganizationId: !Ref OrganizationId
+      Principal: '*'

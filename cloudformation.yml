@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  CloudFormation Template: This template builds a set of Lambda layers and permissions.
+
+Parameters:
+
+  PipelineArtifactsBucket:
+    Description: "The name of an ArtifactStoreBucket containing the package"
+    Type: String
+
+  # *** Environment: The computer systems tier to deploy the application to
+  Environment:
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Type: String
+
+  OrganizationId:
+    Description: "An ID for the organization"
+    Type: String
+    Default: o-reayd-chetwood
+    AllowedPattern: o-[a-z0-9]{10,32}
+
+Resources:
+
+  Psycopg2:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      Parameters:
+        PipelineArtifactsBucket: !Ref PipelineArtifactsBucket
+        Description: "Psycopg is the most popular PostgreSQL database adapter for the Python programming language."
+        LayerName: psycopg2
+        OrganizationId: !Ref OrganizationId
+      TemplateURL: !Sub "https://s3.amazonaws.com/${PipelineArtifactsBucket}/aws-lambda-layers/cloudformation/layer.yml"
+      TimeoutInMinutes: 60
+
+  Requests:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      Parameters:
+        PipelineArtifactsBucket: !Ref PipelineArtifactsBucket
+        Description: "Toolkit for configuring EKS clusters with custom CloudFormation Resources"
+        LayerName: lambdakube
+        OrganizationId: !Ref OrganizationId
+      TemplateURL: !Sub "https://s3.amazonaws.com/${PipelineArtifactsBucket}/aws-lambda-layers/cloudformation/layer.yml"
+      TimeoutInMinutes: 60
