@@ -1,8 +1,8 @@
 APPLICATION_STACK_NAME?=LambdaLayers
 GITHUB_OAUTH_TOKEN?=$(shell bash -c 'read -p "GITHUB_OAUTH_TOKEN: " var; echo $$var')
-GITHUB_REPO?=aws-lambda-layers
+GITHUB_REPO?=lambda-layers
 GITHUB_OWNER?=reayd-chetwood
-GITHUB_BRANCH?=master
+GITHUB_BRANCH?=main
 PROFILE?=$(APPLICATION_STACK_NAME)-$(ENVIRONMENT)
 AWS_DEFAULT_REGION?=
 PIPELINE_ARTIFACTS_BUCKET?=
@@ -10,7 +10,8 @@ PIPELINE_ARTIFACTS_BUCKET?=
 
 build:
 	$(MAKE) -C psycopg2
-	$(MAKE) -C lambdakube
+	$(MAKE) -C requests
+	$(MAKE) -C aws-xray-sdk
 
 upload:
 	aws s3 sync . s3://$(PIPELINE_ARTIFACTS_BUCKET)/aws-lambda-layers/cloudformation/ --exclude "*" --include "layer.yml" --delete
